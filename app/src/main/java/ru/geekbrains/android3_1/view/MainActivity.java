@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.arellomobile.mvp.MvpAppCompatActivity;
 import com.arellomobile.mvp.presenter.InjectPresenter;
@@ -13,6 +14,7 @@ import com.jakewharton.rxbinding.widget.RxTextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import ru.geekbrains.android3_1.R;
 import ru.geekbrains.android3_1.model.CounterModel;
 import ru.geekbrains.android3_1.presenter.MainPresenter;
@@ -27,6 +29,9 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
 
     @BindView(R.id.btn_three)
     Button mButtonThree;
+
+    @BindView(R.id.btn_photo)
+    Button mButtonPhoto;
 
     @BindView(R.id.et)
     EditText mEditText;
@@ -46,17 +51,30 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
 
     @ProvidePresenter
     public MainPresenter provideMainPresenter() {
-        return new MainPresenter(new CounterModel());
+        return new MainPresenter(new CounterModel(this, R.drawable.wallpaper4k),
+                AndroidSchedulers.mainThread());
     }
 
     public void subscribe(Action1<Void> buttonOneAction,
                           Action1<Void> buttonTwoAction,
                           Action1<Void> buttonThreeAction,
-                          Action1<CharSequence> editTextAction) {
+                          Action1<CharSequence> editTextAction,
+                          Action1<Void> buttonPhotoAction) {
         RxView.clicks(mButtonOne).subscribe(buttonOneAction);
         RxView.clicks(mButtonTwo).subscribe(buttonTwoAction);
         RxView.clicks(mButtonThree).subscribe(buttonThreeAction);
         RxTextView.textChanges(mEditText).subscribe(editTextAction);
+        RxView.clicks(mButtonPhoto).subscribe(buttonPhotoAction);
+    }
+
+    @Override
+    public void onConverted() {
+        Toast.makeText(this, "Photo successfully converted", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onConvertedError(Throwable throwable) {
+        Toast.makeText(this, "Photo convert failed", Toast.LENGTH_SHORT).show();
     }
 
     @Override

@@ -3,7 +3,7 @@ package ru.geekbrains.android3_1.presenter;
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.Scheduler;
 import io.reactivex.schedulers.Schedulers;
 import ru.geekbrains.android3_1.model.CounterModel;
 import ru.geekbrains.android3_1.view.MainView;
@@ -11,11 +11,12 @@ import ru.geekbrains.android3_1.view.MainView;
 @InjectViewState
 public class MainPresenter extends MvpPresenter<MainView> {
 
+    private CounterModel mCounterModel;
+    private Scheduler mMainThreadScheduler;
 
-    CounterModel model;
-
-    public MainPresenter(CounterModel model) {
-        this.model = model;
+    public MainPresenter(CounterModel counterModel, Scheduler mainThreadScheduler) {
+        mCounterModel = counterModel;
+        mMainThreadScheduler = mainThreadScheduler;
     }
 
     @Override
@@ -28,19 +29,24 @@ public class MainPresenter extends MvpPresenter<MainView> {
         super.attachView(view);
 
         view.subscribe(
-                aVoid -> model.calculate(0)
+                aVoid -> mCounterModel.calculate(0)
                         .subscribeOn(Schedulers.computation())
-                        .observeOn(AndroidSchedulers.mainThread())
+                        .observeOn(mMainThreadScheduler)
                         .subscribe(integer -> getViewState().setButtonOneText(integer + "")),
-                aVoid -> model.calculate(1)
+                aVoid -> mCounterModel.calculate(1)
                         .subscribeOn(Schedulers.computation())
-                        .observeOn(AndroidSchedulers.mainThread())
+                        .observeOn(mMainThreadScheduler)
                         .subscribe(integer -> getViewState().setButtonTwoText(integer + "")),
-                aVoid -> model.calculate(2)
+                aVoid -> mCounterModel.calculate(2)
                         .subscribeOn(Schedulers.computation())
-                        .observeOn(AndroidSchedulers.mainThread())
+                        .observeOn(mMainThreadScheduler)
                         .subscribe(integer -> getViewState().setButtonThreeText(integer + "")),
-                charSequence -> getViewState().setText(charSequence.toString())
+                charSequence -> getViewState().setText(charSequence.toString()),
+                aVoid -> mCounterModel.convertPhoto()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(mMainThreadScheduler)
+                        .subscribe(object -> getViewState().onConverted(),
+                                throwable -> getViewState().onConvertedError(throwable))
         );
     }
 }
