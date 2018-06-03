@@ -66,6 +66,7 @@ public class MainPresenter extends MvpPresenter<MainView> {
         if (mDisposableConvert != null && !mDisposableConvert.isDisposed()) {
             mDisposableConvert.dispose();
             mDisposableConvert = null;
+            getViewState().showLoading(false);
         }
     }
 }
