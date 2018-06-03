@@ -51,8 +51,10 @@ public class CounterModel {
     public Observable<Object> convertPhoto() {
         return Observable.fromCallable(() -> {
             Bitmap bitmap = BitmapFactory.decodeFile(mAppFolder + "/" + JPG_NAME);
+            Timber.d("decoded");
             try (FileOutputStream out = new FileOutputStream(mAppFolder + "/" + PNG_NAME)) {
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                Timber.d("compressed");
             } catch (IOException e) {
                 e.printStackTrace();
                 throw e;

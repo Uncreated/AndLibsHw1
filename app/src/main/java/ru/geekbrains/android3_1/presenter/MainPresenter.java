@@ -4,6 +4,7 @@ import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 
 import io.reactivex.Scheduler;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import ru.geekbrains.android3_1.model.CounterModel;
 import ru.geekbrains.android3_1.view.MainView;
@@ -24,6 +25,8 @@ public class MainPresenter extends MvpPresenter<MainView> {
         super.onFirstViewAttach();
     }
 
+    private Disposable mDisposableConvert;
+
     @Override
     public void attachView(MainView view) {
         super.attachView(view);
@@ -42,11 +45,27 @@ public class MainPresenter extends MvpPresenter<MainView> {
                         .observeOn(mMainThreadScheduler)
                         .subscribe(integer -> getViewState().setButtonThreeText(integer + "")),
                 charSequence -> getViewState().setText(charSequence.toString()),
-                aVoid -> mCounterModel.convertPhoto()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(mMainThreadScheduler)
-                        .subscribe(object -> getViewState().onConverted(),
-                                throwable -> getViewState().onConvertedError(throwable))
+                aVoid -> {
+                    getViewState().showLoading(true);
+                    mDisposableConvert = mCounterModel.convertPhoto()
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(mMainThreadScheduler)
+                            .subscribe(object -> {
+                                        getViewState().onConverted();
+                                        getViewState().showLoading(false);
+                                    },
+                                    throwable -> {
+                                        getViewState().onConvertedError(throwable);
+                                        getViewState().showLoading(false);
+                                    });
+                }
         );
+    }
+
+    public void convertCancel() {
+        if (mDisposableConvert != null && !mDisposableConvert.isDisposed()) {
+            mDisposableConvert.dispose();
+            mDisposableConvert = null;
+        }
     }
 }

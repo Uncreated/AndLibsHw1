@@ -1,6 +1,7 @@
 package ru.geekbrains.android3_1.view;
 
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -40,7 +41,7 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
     TextView mTextView;
 
     @InjectPresenter
-    MainPresenter presenter;
+    MainPresenter mMainPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,5 +96,25 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
     @Override
     public void setText(String text) {
         mTextView.setText(text);
+    }
+
+    AlertDialog mAlertDialog;
+
+    @Override
+    public void showLoading(boolean show) {
+        if (mAlertDialog != null) {
+            if (mAlertDialog.isShowing()) {
+                mAlertDialog.cancel();
+            }
+            mAlertDialog = null;
+        }
+        if (show) {
+            mAlertDialog = new AlertDialog.Builder(this)
+                    .setCancelable(false)
+                    .setTitle(R.string.loading_title)
+                    .setNegativeButton(R.string.cancel, (dialog, which) -> mMainPresenter.convertCancel())
+                    .create();
+            mAlertDialog.show();
+        }
     }
 }

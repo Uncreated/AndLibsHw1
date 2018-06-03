@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">android3_1</string>
+    <string name="loading_title">Обработка фотографии</string>
+    <string name="cancel">Отмена</string>
 </resources>

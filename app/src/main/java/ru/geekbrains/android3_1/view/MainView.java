@@ -2,6 +2,7 @@ package ru.geekbrains.android3_1.view;
 
 import com.arellomobile.mvp.MvpView;
 import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
+import com.arellomobile.mvp.viewstate.strategy.SingleStateStrategy;
 import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 
@@ -29,4 +30,7 @@ public interface MainView extends MvpView {
 
     @StateStrategyType(value = SkipStrategy.class)
     void onConvertedError(Throwable throwable);
+
+    @StateStrategyType(value = SingleStateStrategy.class)
+    void showLoading(boolean show);
 }
