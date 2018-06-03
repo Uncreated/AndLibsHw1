@@ -117,4 +117,10 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
             mAlertDialog.show();
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        showLoading(false);
+    }
 }
